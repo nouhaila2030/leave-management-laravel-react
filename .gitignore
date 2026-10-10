@@ -22,3 +22,16 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Laravel backend
+/backend/vendor
+/backend/.env
+/backend/.env.backup
+/backend/.env.production
+/backend/storage/logs/*.log
+/backend/storage/framework/views/*.php
+/backend/storage/framework/cache/data/*
+/backend/storage/framework/sessions/*
+/backend/public/storage
+/backend/public/hot
+/backend/public/images

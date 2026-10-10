@@ -157,7 +157,11 @@ Output goes to the `build/` folder.
 
 ## Related Repository
 
-Backend API (Laravel): _to be published_
+This repository contains both the **React frontend** (`src/`) and the **Laravel API backend** (`backend/`).
+
+To run the full stack:
+1. Start the backend: `cd backend && composer install && php artisan serve`
+2. Start the frontend: `npm install && npm start`
 
 ---
 

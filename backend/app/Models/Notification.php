@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Notification extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'employee_id',
+        'title',
+        'message',
+        'type',
+        'is_read',
+        'related_id',
+        'related_type'
+    ];
+
+    protected $casts = [
+        'is_read' => 'boolean',
+        'created_at' => 'datetime'
+    ];
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
+
+    public function leaveRequest()
+    {
+        return $this->belongsTo(LeaveRequest::class, 'related_id')
+                    ->where('related_type', 'leave_request');
+    }
+}
+
+
