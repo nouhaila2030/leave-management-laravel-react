@@ -1,170 +1,148 @@
-# Leave Management System — React Frontend
+# Leave Management System (Laravel API + React)
 
-A web application for managing employee leave requests in a public administration context. Built with React, it communicates with a Laravel REST API backend.
+Full-stack web application that digitalizes leave management for an HR department in a public administration context. Built during an internship (July 2025) to replace paper forms, Excel files and emails with a centralized, trackable workflow.
 
 > **Status:** individual internship project, validated by my supervisor. Not deployed in production by the organization.
 
----
+## Repository structure
+
+```
+.
+├── src/, public/     # React frontend
+├── backend/          # Laravel REST API
+├── docs/             # Documentation and screenshots
+└── package.json
+```
 
 ## Features
 
 ### Employee portal
-- Personalized welcome page with greeting based on time of day
-- Profile overview: personal details, department, position, leave balance
-- Submit a new leave request (annual, sick, maternity, emergency)
+- Personalized welcome page and profile overview (personal details, department, position, leave balance)
+- Submit a leave request (annual, sick, maternity, emergency)
 - Automatic calculation of working days (weekends excluded)
-- Real-time balance check before submission — blocks if balance is insufficient
-- Track all submitted requests with their status (pending / approved / rejected)
-- Download the approved leave certificate as a PDF
-- Notification center with unread count badge and mark-as-read action
+- Real-time balance check before submission, blocked if the balance is insufficient
+- Request tracking with status (pending / approved / rejected)
+- Download of the approved leave certificate as a PDF
+- Notification center with unread badge and mark-as-read action
 
 ### Admin portal
-- Dashboard with key statistics: total requests, approved, pending, utilization rate
-- Employee directory with CIN, phone, email, department, and leave balance
+- Dashboard with key statistics: total, approved and pending requests, utilization rate
+- Employee directory with department and leave balance
 - Feed of the 5 most recent requests
-- Manage all leave requests: approve or reject with one click
-- Download the leave certificate PDF for any approved request
-- Dedicated view for all approved requests
+- Approve or reject a request in one click, with automatic update of the employee's balance
+- Dedicated view of approved requests and certificate download
 
 ### General
 - Bilingual interface (French / Arabic, RTL supported)
-- Bearer token authentication (Laravel Sanctum) stored in `localStorage`
-- Role-based routing: `/employee-dashboard` and `/admin-dashboard`
+- Role-based access: `employee` / `admin`
 - Automatic redirect to `/login` on 401 / expired token
-- Responsive design with Tailwind CSS utility classes
 
----
+## Architecture
 
-## Tech Stack
+```
+React (frontend)  <-- HTTP / JSON, Bearer token -->  Laravel REST API (MVC, Eloquent)  <-->  MySQL
+```
 
-| Layer | Technology |
+### Backend (`backend/`)
+- **Framework:** Laravel (PHP), MVC architecture, Eloquent ORM
+- **Controllers** (`app/Http/Controllers/Api`): authentication, leave requests, leave balances, leave history, notifications, profile, admin and dashboard statistics
+- **Models:** `Employee`, `LeaveRequest`, `LeaveBalance`, `Notification`
+- **Middleware:** admin role check, CORS, cookie encryption, CSRF verification
+- **Authentication:** Laravel Sanctum Bearer tokens
+
+### Database (MySQL)
+
+| Table | Purpose |
 |---|---|
-| UI framework | React 19 |
-| Routing | React Router DOM 7 |
-| HTTP client | Axios 1 + native `fetch` |
-| Styling | Tailwind CSS (utility classes) |
-| Auth | Bearer token (Laravel Sanctum) stored in `localStorage` |
-| Backend (separate repo) | Laravel 10 + Sanctum |
+| `employees` | Employee information and role |
+| `leave_requests` | Requests with dates, type, status and admin comment |
+| `leave_types` | Leave categories (annual, sick, maternity, exceptional...) |
+| `leave_balances` | Remaining leave days per employee |
+| `notifications` | Notifications for employees and admins |
 
----
+Laravel internal tables (migrations, sessions, tokens, jobs, cache) complete the schema.
 
-## Project Structure
+### Frontend (`src/`)
+React 19, React Router 7, Axios, Tailwind CSS utility classes. Main components: landing page, login, employee dashboard, admin dashboard, leave request form, notifications, approved requests, auth context.
 
-```
-src/
-├── components/
-│   ├── LandingPage.js          # Bilingual landing page (FR/AR)
-│   ├── Login.js                # Login form
-│   ├── EmployeeDashboard.js    # Employee home, request form, history, notifications
-│   ├── AdminDashboard.js       # Admin stats, request management, employee list
-│   ├── EmployeeNavigation.js   # Employee top navigation bar
-│   ├── AdminNavigation.js      # Admin top navigation bar
-│   ├── LeaveRequestForm.js     # Leave submission form with live day calculation
-│   ├── LeaveHistory.js         # Leave history component
-│   ├── Notifications.js        # Notifications component
-│   ├── ApprovedRequests.js     # Approved requests list
-│   ├── AdminRequests.js        # Admin requests list
-│   └── Layout.js               # Layout wrapper
-├── contexts/
-│   └── AuthContext.js          # Auth context (login, logout, token management)
-├── utils/
-│   ├── api.js                  # Axios instance with auth interceptors
-│   ├── dateUtils.js            # Date helper functions
-│   └── leaveBalance.js         # Leave balance utilities
-└── App.js                      # Route definitions
-```
+## Getting started
 
----
+**Prerequisites:** PHP 8.1+, Composer, Node.js 18+, MySQL.
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js ≥ 18
-- The Laravel API backend running on `http://localhost:8000`
-
-### Installation
+### 1. Backend
 
 ```bash
-git clone https://github.com/nouhaila2030/leave-management-laravel-react.git
-cd leave-management-laravel-react
-npm install
+cd backend
+composer install
+cp .env.example .env
+php artisan key:generate
+# Edit .env: set DB_DATABASE, DB_USERNAME, DB_PASSWORD
+php artisan migrate
+php artisan serve        # http://localhost:8000
 ```
 
-### Configuration
+### 2. Frontend (in another terminal, from the repository root)
+
+```bash
+npm install
+npm start                # http://localhost:3000
+```
 
 The API base URL is set to `http://localhost:8000/api` in `src/utils/api.js`.
-Change it to match your backend URL if needed.
 
-### Run in development mode
+Create demo accounts (one `admin`, one `employee`) with fictional data to log in.
 
-```bash
-npm start
-```
-
-Opens at [http://localhost:3000](http://localhost:3000).
-
-### Build for production
-
-```bash
-npm run build
-```
-
-Output goes to the `build/` folder.
-
----
-
-## API Endpoints Used
+## API endpoints used
 
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/api/login` | Authenticate and retrieve Bearer token |
 | POST | `/api/logout` | Invalidate token |
-| GET | `/api/me` | Get current user profile |
-| GET | `/api/my-requests` | Get employee's requests + leave balance |
-| POST | `/api/leave-requests` | Submit a new leave request |
-| POST | `/api/calculate-days` | Calculate working days for a date range |
-| GET | `/api/notifications` | Get notifications + unread count |
+| GET | `/api/me` | Current user profile |
+| GET | `/api/my-requests` | Employee's requests and leave balance |
+| POST | `/api/leave-requests` | Submit a leave request |
+| POST | `/api/calculate-days` | Working days for a date range |
+| GET | `/api/notifications` | Notifications and unread count |
 | PUT | `/api/notifications/:id/read` | Mark a notification as read |
-| GET | `/api/leave-requests/:id/certificate` | Download leave certificate (PDF) |
-| GET | `/api/admin/dashboard/stats` | Admin dashboard statistics |
-| GET | `/api/admin/leave-requests` | List all leave requests (admin) |
+| GET | `/api/leave-requests/:id/certificate` | Leave certificate (PDF) |
+| GET | `/api/admin/dashboard/stats` | Admin statistics |
+| GET | `/api/admin/leave-requests` | All requests (admin) |
 | PUT | `/api/admin/leave-requests/:id/status` | Approve or reject a request |
-| GET | `/api/admin/approved-requests` | List approved requests (admin) |
-| GET | `/api/admin/leave-requests/:id/certificate` | Download certificate (admin) |
+| GET | `/api/admin/approved-requests` | Approved requests (admin) |
+| GET | `/api/admin/leave-requests/:id/certificate` | Certificate (admin) |
 
----
+## Authentication flow
 
-## Authentication Flow
+1. The user submits credentials on `/login`.
+2. Laravel Sanctum returns a Bearer token (opaque token, not a JWT).
+3. The token and user object are stored in `localStorage`.
+4. An Axios interceptor adds `Authorization: Bearer <token>` to every request.
+5. On a 401 response, the interceptor clears the storage and redirects to `/login`.
 
-1. User submits credentials on `/login`.
-2. Laravel Sanctum returns a Bearer token (opaque token, not JWT).
-3. Token and user object are stored in `localStorage`.
-4. Every request adds `Authorization: Bearer <token>` via the Axios interceptor in `src/utils/api.js`.
-5. On 401 response, the interceptor clears storage and redirects to `/login`.
-6. Role check on each dashboard mount: employees redirected if they access the admin route and vice versa.
+## Security notes
 
----
+- Access control is enforced on the API side (Laravel middleware). The role-based routing in the React app only improves the user experience and is not a security boundary.
+- The token is stored in `localStorage` for simplicity. In production, an `httpOnly` cookie would reduce the impact of XSS attacks.
+- Secrets are kept out of the repository: `.env` is ignored and `.env.example` is provided.
+- All data used in development is fictitious.
 
-## Leave Balance Logic
+## Known limitations and future improvements
 
-- Each employee has an annual allocation of working days.
-- When a request is submitted, working days are counted server-side (weekends excluded).
-- The frontend calls `/api/calculate-days` in real time as the user picks dates, and disables the submit button if the balance is insufficient.
-- Remaining days are shown on the employee home tab and updated after each approved request.
+- Not deployed in production
+- Automated tests (PHPUnit / Jest) to add
+- Public holidays handling in the working-days calculation
+- Email notifications in addition to in-app notifications
+- Docker setup for easier deployment
 
----
+## My contribution
 
-## Related Repository
-
-This repository contains both the **React frontend** (`src/`) and the **Laravel API backend** (`backend/`).
-
-To run the full stack:
-1. Start the backend: `cd backend && composer install && php artisan serve`
-2. Start the frontend: `npm install && npm start`
-
----
+Individual project: requirements gathering with my supervisor, database modeling (conceptual model and MySQL schema), UI mockups in Figma, Laravel API, React interface, role management, notifications, and manual testing.
 
 ## License
 
-Academic project developed during a summer internship (July 2025). All data used in development is fictitious.
+Academic project developed during a summer internship (July 2025).
+
+## Author
+
+**Nouhaila El Hamal** — Engineering student in Information Systems Security  
+[LinkedIn](https://www.linkedin.com/in/nouhaila-el-hamal-972805293/) · [GitHub](https://github.com/nouhaila2030)
