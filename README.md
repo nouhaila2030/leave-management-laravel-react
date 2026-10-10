@@ -138,6 +138,9 @@ The API base URL is set to `http://localhost:8000/api` in `src/utils/api.js`.
 - Public holidays handling in the working-days calculation
 - Email notifications in addition to in-app notifications
 - Docker setup for easier deployment
+- Token stored in `localStorage` — in production, an `httpOnly` cookie would reduce XSS exposure
+- PDF generation: `isRemoteEnabled` set to `false` (no external resources loaded) ✅
+- Log entries contain only request IDs, no personal data ✅
 
 ## My contribution
 

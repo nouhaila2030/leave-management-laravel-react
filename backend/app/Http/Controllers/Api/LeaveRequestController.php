@@ -383,21 +383,16 @@ class LeaveRequestController extends Controller
               'employee' => $leaveRequest->employee,
           ];
 
-          // AJOUTEZ CE LOG POUR VÉRIFIER LES DONNÉES AVANT DE LES PASSER À LA VUE
-          Log::info("DEBUG: Données passées à la vue PDF", [
-              'leaveRequest_id' => $data['leaveRequest']->id ?? 'N/A',
-              'leaveRequest_total_days' => $data['leaveRequest']->total_days ?? 'N/A',
-              'leaveRequest_start_date' => $data['leaveRequest']->start_date ?? 'N/A',
-              'leaveRequest_end_date' => $data['leaveRequest']->end_date ?? 'N/A',
-              'employee_id' => $data['employee']->id ?? 'N/A',
-              'employee_full_name' => $data['employee']->full_name ?? 'N/A',
-              'employee_position' => $data['employee']->position ?? 'N/A',
+          // Log de debug sans données personnelles
+          Log::info("Génération du certificat PDF", [
+              'request_id' => $data['leaveRequest']->id ?? 'N/A',
+              'total_days' => $data['leaveRequest']->total_days ?? 'N/A',
           ]);
 
           $pdf = Pdf::loadView('certificates.leave_certificate', $data)
-          ->setOptions(['isRemoteEnabled' => true]);
+          ->setOptions(['isRemoteEnabled' => false]);
 
-          Log::info("✅ Attestation PDF générée avec succès", ['request_id' => $id]);
+          Log::info("Certificat PDF généré avec succès", ['request_id' => $id]);
 
           return $pdf->download('attestation_conge_' . $leaveRequest->employee->full_name . '_' . $leaveRequest->id . '.pdf');
 
