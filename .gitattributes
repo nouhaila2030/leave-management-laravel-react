@@ -1,0 +1,9 @@
+# Exclure les fichiers de lock des statistiques de langages GitHub
+package-lock.json linguist-generated=true
+backend/composer.lock linguist-generated=true
+backend/composer.json linguist-generated=true
+
+# Exclure les fichiers de config JS des stats
+*.config.js linguist-language=Text
+vite.config.js linguist-generated=true
+backend/vite.config.js linguist-generated=true
