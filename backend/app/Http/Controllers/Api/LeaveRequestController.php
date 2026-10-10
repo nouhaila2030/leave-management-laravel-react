@@ -392,9 +392,6 @@ class LeaveRequestController extends Controller
               'employee_id' => $data['employee']->id ?? 'N/A',
               'employee_full_name' => $data['employee']->full_name ?? 'N/A',
               'employee_position' => $data['employee']->position ?? 'N/A',
-              // ✅ MISE À JOUR DU CHEMIN DE L'IMAGE POUR LE LOG
-              'image_path_exists' => file_exists(public_path('images/logo_ministre.png')) ? 'true' : 'false',
-              'image_path' => public_path('images/logo_ministre.png')
           ]);
 
           $pdf = Pdf::loadView('certificates.leave_certificate', $data)

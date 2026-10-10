@@ -77,9 +77,16 @@ composer install
 cp .env.example .env
 php artisan key:generate
 # Edit .env: set DB_DATABASE, DB_USERNAME, DB_PASSWORD
-php artisan migrate
+php artisan migrate --seed
 php artisan serve        # http://localhost:8000
 ```
+
+Demo accounts created by the seeder:
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@leave-management.local | password123 |
+| Employee | employee@leave-management.local | password111 |
 
 ### 2. Frontend (in another terminal, from the repository root)
 
@@ -89,8 +96,6 @@ npm start                # http://localhost:3000
 ```
 
 The API base URL is set to `http://localhost:8000/api` in `src/utils/api.js`.
-
-Create demo accounts (one `admin`, one `employee`) with fictional data to log in.
 
 ## API endpoints used
 
